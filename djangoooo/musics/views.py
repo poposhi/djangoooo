@@ -22,10 +22,30 @@ def hello_view(request):
     #顯示queryset>>html
     #知道有幾個queryset  x軸是時間(小時，分) y軸是vavg
     long =objecttttt.count()
-    
+    #畫出來 1把所有vavg都放進去array ，x軸先用普通array
+    vavg = np.zeros((long,1))#為了要疊代用21*1的矩陣
+    timeee = np.zeros((long, 1))
+    count=0
+    for i in objecttttt:
+        vavg[count]=i.Vavg
+        timeee[count] =i.id
+        count=count+1
 
-    html=template.render(locals())
-    return HttpResponse(html)
+    fig = Figure()
+    canvas = FigureCanvas(fig) #canvas是把figure 轉換後的物件
+    ax = fig.add_subplot(111)
+    x=timeee#new
+    #x = np.arange(-2, 1.5, .01)
+    y =vavg# np.sin(2 * x)
+
+    #y = np.fromiter(posts, dtype=('i4'))  # 取出來是object
+    ax.plot(x, y)
+    response=django.http.HttpResponse(content_type='image/png')  #這個變數是用http傳圖片
+    canvas.print_png(response) #讓他可以嵌入網頁
+    return response
+
+    #html=template.render(locals())
+    #return HttpResponse(html)
 
 # Create your views here.
 class MusicViewSet(viewsets.ModelViewSet):
