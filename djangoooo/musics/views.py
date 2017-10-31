@@ -1,20 +1,32 @@
-# Create your views here.
 #要先Import 架構 httpresponse
+from django.template.loader import get_template
 from musics.models import Music #引入資料庫結構
 from musics.serializers import MusicSerializer
 from django.shortcuts import render  #回傳http用的
     #render的第三個是用context  ,A dictionary of values
 from rest_framework import viewsets
-
-
-
+from .models import Post
+import datetime
+from datetime import datetime as dt
 def hello_view(request):
-    #Music.objects.create(song='song1hellotest', singer='SKE48')
-    return render(request, 'hello_django.html', {
 
-        'data': "Hello Django ",
-        'popo':Music.objects.values('id','song'),    #Author.objects.values_list('name', flat=True)  value 是要放dic進去，會回傳dic
-    })
+    template = get_template('hello_django.html')
+    #休息一下，下面是要找出datetime的range，有一個__range的東西搞不懂，到底IMPORT到長DATETIME還是短DATETIME??
+    #combine(date物件,時間) 所以現在要做出時間物件給combine
+    #用完下面要把它分開，
+    COMBINEA =datetime(2017,10,15) #第一個arg需要date 物件 ，第二個需要 datetime.time
+    rangea= dt(2017,10,30,10)#year, month, day, hour=0, minute=0, second=0, microsecond=0,#datetime.combine(COMBINEA, datetime.time(0,0))
+    rangeb = dt(2017,10,30,23)# datetime.combine(COMBINEA, datetime.max))
+    objecttttt = Post.objects.filter(name='test_facility_name2').filter(pub_date__range=(rangea,rangeb )) #用range再放入dt物件
+    time_date = objecttttt.exists()
+    #顯示queryset>>html
+    #知道有幾個queryset  x軸是時間(小時，分) y軸是vavg
+    long =objecttttt.count()
+    
+
+    html=template.render(locals())
+    return HttpResponse(html)
+
 # Create your views here.
 class MusicViewSet(viewsets.ModelViewSet):
     queryset = Music.objects.all()

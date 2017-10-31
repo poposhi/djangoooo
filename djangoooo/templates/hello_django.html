@@ -5,8 +5,13 @@
     <title>Title</title>
 </head>
 <body>
-    {{data}}
-       {{popo}}
 
+       {{popo}}
+   time_date {{time_date}}
+{{detaildate}}
+{% for post in objecttttt %}
+       {{ post.id | truncatechars:40 }}
+    {% endfor %}
+count:{{long}}
 </body>
 </html>
