@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- base 會include header >> 準備給別人繼承(或是說輸入文字)-->
+<!-- 寫好title content 的基本架構，並在需要輸入的地方挖空格-->
+<!-- 縮短html長度--> <!-- -->
+<head><!-- 在header 設置title 的格式-->
+    <meta charset="UTF-8">
+    <title>
+        {%block title %} {% endblock %}
+    </title>
+</head>
+
+<!--要在body include  header --><!-- -->
+<body>
+    {% include 'header_test.html'  %}
+    <!-- div 不知道幹嘛的 >>不用%--><!-- -->
+     <div class="container">
+    	
+    	<form name='inputform' action='' method="get"> 
+    		<label for='start_day'>起始時間: </label>
+    		<input name="start_day" id="start_day" type="text">日
+    		<input name="start_hour" id="start_hour" type="text">
+    		<label for='start_hour'>時 </label><br/>
+
+    		<label for='end_day'>結束時間: </label>
+    		<input name="end_day" id="end_day" type="text">日
+    		<input name="end_hour" id="end_hour" type="text">
+    		<label for='end_hour'>時 </label><br/>
+
+    		<input type='submit' value="submit">
+    		<input type="reset" name="reset">
+    	</form>
+    </div>
+    這是base的body <br/>
+    {%if status%}
+    status 是 {{status}}<br/>
+    <br/>
+    rangeb:: {{rangeb}}<br/>
+    rangeb_type:: {{rangeb_type}}<br/>
+    {%endif%}
+
+
+</body>
+</html>
+
+<!-- --><!-- -->

@@ -4,44 +4,61 @@ from musics.models import Music #引入資料庫結構
 from musics.serializers import MusicSerializer
 from django.shortcuts import render  #回傳http用的
     #render的第三個是用context  ,A dictionary of values
+from django.shortcuts import render_to_response
 from rest_framework import viewsets
 from .models import Post
 import datetime
 from datetime import datetime as dt
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas #for web
+from matplotlib.figure import Figure #for web
+
 def hello_view(request):
 
     template = get_template('hello_django.html')
-    #休息一下，下面是要找出datetime的range，有一個__range的東西搞不懂，到底IMPORT到長DATETIME還是短DATETIME??
+    #下面是要找出datetime的range，有一個__range的東西搞不懂，到底IMPORT到長DATETIME還是短DATETIME??
     #combine(date物件,時間) 所以現在要做出時間物件給combine
     #用完下面要把它分開，
-    COMBINEA =datetime(2017,10,15) #第一個arg需要date 物件 ，第二個需要 datetime.time
-    rangea= dt(2017,10,30,10)#year, month, day, hour=0, minute=0, second=0, microsecond=0,#datetime.combine(COMBINEA, datetime.time(0,0))
-    rangeb = dt(2017,10,30,23)# datetime.combine(COMBINEA, datetime.max))
-    objecttttt = Post.objects.filter(name='test_facility_name2').filter(pub_date__range=(rangea,rangeb )) #用range再放入dt物件
+    #COMBINEA =datetime(2017,10,15) #第一個arg需要date 物件 ，第二個需要 datetime.time
+    rangea= dt(2017,11,3,10)#year, month, day, hour=0, minute=0, second=0, microsecond=0,#datetime.combine(COMBINEA, datetime.time(0,0))
+    rangeb = dt(2017,11,3,23)# datetime.combine(COMBINEA, datetime.max))
+    objecttttt = Post.objects.filter(name='test_facility_name_1103_z').filter(pub_date__range=(rangea,rangeb )) #用range再放入dt物件
+    objecttttt_y = Post.objects.filter(name='test_facility_name_1103_y').filter(pub_date__range=(rangea,rangeb )) #用range再放入dt物件
     time_date = objecttttt.exists()
     #顯示queryset>>html
     #知道有幾個queryset  x軸是時間(小時，分) y軸是vavg
     long =objecttttt.count()
     #畫出來 1把所有vavg都放進去array ，x軸先用普通array
     vavg = np.zeros((long,1))#為了要疊代用21*1的矩陣
+    vavg_y = np.zeros((long,1))#為了要疊代用21*1的矩陣
     timeee = np.zeros((long, 1))
+    title ='object id'
     count=0
     for i in objecttttt:
         vavg[count]=i.Vavg
         timeee[count] =i.id
         count=count+1
-
+        title=title+str(i.id)+','
+    count=0
+    for i in objecttttt_y:
+        vavg_y[count] = i.Vavg
+        count = count + 1
     fig = Figure()
     canvas = FigureCanvas(fig) #canvas是把figure 轉換後的物件
     ax = fig.add_subplot(111)
     x=timeee#new
-    #x = np.arange(-2, 1.5, .01)
-    y =vavg# np.sin(2 * x)
-
+    y =vavg
+    y_y=vavg_y
+    #ax.set_title(title)
+    ax.set_ylabel('vavg')
+    ax.set_xlabel(str(rangea)+' to '+str(rangeb) )
     #y = np.fromiter(posts, dtype=('i4'))  # 取出來是object
     ax.plot(x, y)
+    ax.plot(x,y_y)
     response=django.http.HttpResponse(content_type='image/png')  #這個變數是用http傳圖片
     canvas.print_png(response) #讓他可以嵌入網頁
+
+    #html=template.render(locals())
+    #return HttpResponse(html)
     return response
 
     #html=template.render(locals())
@@ -102,6 +119,87 @@ def homepage(request):
     html = template.render(locals())
     return HttpResponse(html)
 
+def post_test(request):
+    from .models import Post
+    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+    from matplotlib.figure import Figure
+    from datetime import datetime as dt
+    template = get_template('post_test.html')
+    try: #直接變成int
+        start_day = int( request.GET['start_day'])
+        start_hour= int( request.GET['start_hour'])
+        end_day   = int( request.GET['end_day'])
+        end_hour  = int( request.GET['end_hour'])
+        #fetch_Vavg_from_page =int(fetch_Vavg_from_page)
+        #fetch_object = Post.objects.get(id=fetch_Vavg_from_page)
+        a=int('2017')
+        rangea = dt(a, 11, start_day, start_hour)
+        rangeb = dt(a, 11, end_day, end_hour)
+        status ='正常的結束try'
+        ''' 寫一個傳入兩個物件可以回傳圖的>>還沒寫'''
+        objecttttt = Post.objects.filter(name='test_facility_name_1103_z').filter(
+            pub_date__range=(rangea, rangeb))  # 用range再放入dt物件
+        objecttttt_y = Post.objects.filter(name='test_facility_name_1103_y').filter(
+            pub_date__range=(rangea, rangeb))  # 用range再放入dt物件
+        # 知道有幾個queryset  x軸是時間(小時，分) y軸是vavg
+        long = objecttttt.count()
+        # 畫出來 1把所有vavg都放進去array ，x軸先用普通array
+        vavg = np.zeros((long, 1))  # 為了要疊代用21*1的矩陣
+        vavg_y = np.zeros((long, 1))  # 為了要疊代用21*1的矩陣
+        timeee = np.zeros((long, 1))
+        title = 'object id'
+        count = 0
+        for i in objecttttt:
+            vavg[count] = i.Vavg
+            timeee[count] = i.id
+            count = count + 1
+            title = title + str(i.id) + ','
+        count = 0
+        for i in objecttttt_y:
+            vavg_y[count] = i.Vavg
+            count = count + 1
+        fig = Figure()
+        canvas = FigureCanvas(fig)  # canvas是把figure 轉換後的物件
+        ax = fig.add_subplot(111)
+        x = timeee  # new
+        y = vavg
+        y_y = vavg_y
+
+        ax.set_ylabel('vavg')
+        ax.set_xlabel(str(rangea) + ' to ' + str(rangeb))
+        ax.plot(x, y)
+        ax.plot(x, y_y)
+        response = django.http.HttpResponse(content_type='image/png')  # 這個變數是用http傳圖片
+        canvas.print_png(response)  # 讓他可以嵌入網頁
+
+        return response
+    except:
+        status = '跑到except'
+
+
+    html = template.render(locals())
+    return HttpResponse(html)
+
+def base_test(request):
+    template = get_template('base_test.html')
+
+    try:
+        #if 'Vavg' in request.GET:
+        fetch_Vavg_from_page = str( request.GET['Vavg'] )
+    except:
+        fetch_Vavg_from_page = '跑到except'
+
+    html = template.render(locals())
+    return HttpResponse(html)
+    '''base 不需要的code
+    if 'Vavg' in request.GET:
+        return HttpResponse('Welcome!~'+request.GET['Vavg'])
+    else:
+        return render_to_response('base_test.html', locals())
+    if 'user_name' in request.GET:
+        return HttpResponse('Welcome!~'+request.GET['user_name'])
+    else:
+        return render_to_response('base_test.html',locals())'''''
 def showpost(request, slug):
     template = get_template('post.html')
     try:

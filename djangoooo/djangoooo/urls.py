@@ -8,7 +8,8 @@ from musics.views import hello_view #要記得Import  func in view
 from musics.views import homepage
 from musics.views import showpost
 from musics.views import mplimage
-
+from musics.views import post_test
+from musics.views import base_test
 router = DefaultRouter()
 router.register(r'music', views.MusicViewSet)
 
@@ -19,5 +20,7 @@ urlpatterns = [
     url(r'^$', homepage),
     url(r'^post/(\w+)$', showpost),
     url(r'mplimage.png', mplimage),
+    url(r'^post_test/',post_test),
+    url(r'^base_test/',base_test)
     #url(r'^admin/', include(admin.site.urls)),
 ]
